@@ -129,3 +129,6 @@ def main(prog=None, style=None):
     else:
         warnings = check(sys.stdin.read(), '<stdin>', reporter)
     raise SystemExit(warnings > 0)
+
+def emacs_main(prog=None):
+    main(prog, style='emacs')

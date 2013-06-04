@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-from pyflakes.scripts.pyflakes import main
-main(style='emacs')
+from pyflakes.scripts.pyflakes import emacs_main
+emacs_main()

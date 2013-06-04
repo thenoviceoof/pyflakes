@@ -19,7 +19,8 @@ else:
         extra = {'tests_require': ['unittest2py3k'],
                  'test_suite': 'unittest2.collector.collector'}
     extra['entry_points'] = {
-        'console_scripts': ['pyflakes = pyflakes.api:main'],
+        'console_scripts': ['pyflakes = pyflakes.api:main',
+                            'epyflakes = pyflakes.api:emacs_main'],
     }
 
 
