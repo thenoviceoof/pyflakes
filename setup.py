@@ -10,7 +10,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-    extra = {'scripts': ["bin/pyflakes"]}
+    extra = {'scripts': ["bin/pyflakes", "bin/epyflakes"]}
 else:
     if sys.version_info < (3,):
         extra = {'tests_require': ['unittest2'],
