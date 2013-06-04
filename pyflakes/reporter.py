@@ -10,7 +10,7 @@ class Reporter(object):
     Formats the results of pyflakes checks to users.
     """
 
-    def __init__(self, warningStream, errorStream):
+    def __init__(self, warningStream, errorStream, style=None):
         """
         Construct a L{Reporter}.
 
@@ -20,9 +20,11 @@ class Reporter(object):
         @param errorStream: A file-like object where error output will be
             written to.  The stream's C{write} method must accept unicode.
             C{sys.stderr} is a good value.
+        @param style: A parameter to control the output format
         """
         self._stdout = warningStream
         self._stderr = errorStream
+        self.style = style
 
     def unexpectedError(self, filename, msg):
         """
@@ -50,14 +52,17 @@ class Reporter(object):
         @param text: The source code containing the syntax error.
         @ptype text: C{unicode}
         """
-        line = text.splitlines()[-1]
-        if offset is not None:
-            offset = offset - (len(text) - len(line))
-        self._stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
-        self._stderr.write(line)
-        self._stderr.write('\n')
-        if offset is not None:
-            self._stderr.write(" " * (offset + 1) + "^\n")
+        if self.style == "emacs":
+            self._stderr.write('%s:%d: Error (E): %s\n' % (filename, lineno, msg))
+        else:
+            line = text.splitlines()[-1]
+            if offset is not None:
+                offset = offset - (len(text) - len(line))
+            self._stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
+            self._stderr.write(line)
+            self._stderr.write('\n')
+            if offset is not None:
+                self._stderr.write(" " * (offset + 1) + "^\n")
 
     def flake(self, message):
         """
@@ -65,12 +70,16 @@ class Reporter(object):
 
         @param: A L{pyflakes.messages.Message}.
         """
-        self._stdout.write(str(message))
-        self._stdout.write('\n')
+        if self.style == 'emacs':
+            self._stderr.write(message.emacs_str())
+            self._stderr.write('\n')
+        else:
+            self._stdout.write(str(message))
+            self._stdout.write('\n')
 
 
-def _makeDefaultReporter():
+def _makeDefaultReporter(style=None):
     """
     Make a reporter that can be used when no reporter is specified.
     """
-    return Reporter(sys.stdout, sys.stderr)
+    return Reporter(sys.stdout, sys.stderr, style=style)

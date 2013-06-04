@@ -6,6 +6,7 @@ Provide the class Message and its subclasses.
 class Message(object):
     message = ''
     message_args = ()
+    severity = 'E'  # set of {E, W}
 
     def __init__(self, filename, loc):
         self.filename = filename
@@ -16,9 +17,21 @@ class Message(object):
         return '%s:%s: %s' % (self.filename, self.lineno,
                               self.message % self.message_args)
 
+    @property
+    def severity_name(self):
+        return {'E': 'Error', 'W': 'Warning'}[self.severity]
+
+    def emacs_str(self):
+        return '%s:%s: %s (%s): %s' % (self.filename,
+                                       self.lineno,
+                                       self.severity_name,
+                                       self.severity,
+                                       self.message % self.message_args)
+
 
 class UnusedImport(Message):
     message = '%r imported but unused'
+    severity = 'W'
 
     def __init__(self, filename, loc, name):
         Message.__init__(self, filename, loc)
@@ -27,6 +40,7 @@ class UnusedImport(Message):
 
 class RedefinedWhileUnused(Message):
     message = 'redefinition of unused %r from line %r'
+    severity = 'W'
 
     def __init__(self, filename, loc, name, orig_loc):
         Message.__init__(self, filename, loc)
@@ -35,6 +49,7 @@ class RedefinedWhileUnused(Message):
 
 class RedefinedInListComp(Message):
     message = 'list comprehension redefines %r from line %r'
+    severity = 'W'
 
     def __init__(self, filename, loc, name, orig_loc):
         Message.__init__(self, filename, loc)
@@ -43,6 +58,7 @@ class RedefinedInListComp(Message):
 
 class ImportShadowedByLoopVar(Message):
     message = 'import %r from line %r shadowed by loop variable'
+    severity = 'W'
 
     def __init__(self, filename, loc, name, orig_loc):
         Message.__init__(self, filename, loc)
@@ -51,6 +67,7 @@ class ImportShadowedByLoopVar(Message):
 
 class ImportStarUsed(Message):
     message = "'from %s import *' used; unable to detect undefined names"
+    severity = 'W'
 
     def __init__(self, filename, loc, modname):
         Message.__init__(self, filename, loc)
@@ -102,6 +119,7 @@ class DuplicateArgument(Message):
 
 class Redefined(Message):
     message = 'redefinition of %r from line %r'
+    severity = 'W'
 
     def __init__(self, filename, loc, name, orig_loc):
         Message.__init__(self, filename, loc)
@@ -122,6 +140,7 @@ class UnusedVariable(Message):
     used.
     """
     message = 'local variable %r is assigned to but never used'
+    severity = 'W'
 
     def __init__(self, filename, loc, names):
         Message.__init__(self, filename, loc)
